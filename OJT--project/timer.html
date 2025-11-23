@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeGalaxy - Timer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1> CodeGalaxy</h1>
+            <p id="mood-display" data-testid="text-mood">Focus Session</p>
+        </header>
+
+        <main>
+            <div class="todo-section">
+                <h2> What will you work on?</h2>
+                <div class="todo-input-group">
+                    <input 
+                        type="text" 
+                        id="todo-input" 
+                        placeholder="Add a task (e.g., Finish report, Study chapter 5...)"
+                        data-testid="input-todo"
+                    />
+                    <button id="add-todo-btn" class="btn btn-primary" data-testid="button-add-todo">
+                        Add Task
+                    </button>
+                </div>
+                <div id="todo-list" class="todo-list" data-testid="list-todos">
+                    <p class="empty-state">No tasks added yet. Add what you'll focus on!</p>
+                </div>
+            </div>
+
+            <!-- <div class="timer-section">
+                <canvas id="galaxy-canvas" width="400" height="400"></canvas> -->
+                
+                <div class="timer-display" data-testid="text-timer">
+                    <span id="minutes">25</span>:<span id="seconds">00</span>
+                </div>
+
+                <div class="timer-controls">
+                    <button id="start-btn" class="btn btn-primary" data-testid="button-start">
+                        Start
+                    </button>
+                    <button id="pause-btn" class="btn btn-secondary" style="display: none;" data-testid="button-pause">
+                        Pause
+                    </button>
+                    <button id="stop-btn" class="btn btn-danger" style="display: none;" data-testid="button-stop">
+                        Stop
+                    </button>
+                </div>
+
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+            </div>
+
+            <br>
+
+            <div class="navigation">
+                <a href="index.html" class="nav-link" data-testid="link-home">
+                     Back to Home
+                </a>
+                <a href="dashboard.html" class="nav-link" data-testid="link-dashboard">
+                     Dashboard
+                </a>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
