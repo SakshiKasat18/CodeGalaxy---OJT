@@ -25,7 +25,7 @@ def get_client() -> MongoClient:
             # Fallback to local
             mongo_uri = "mongodb://localhost:27017/codegalaxy"
             print(f"MONGODB_URI not set. Using local fallback: {mongo_uri}")
-        _client = MongoClient(mongo_uri)
+        _client = MongoClient(mongo_uri, tlsAllowInvalidCertificates=True)
     return _client
 
 
