@@ -1,135 +1,231 @@
-# CodeGalaxy
+# 🌌 **CodeGalaxy**
 
-CodeGalaxy is a focus & productivity dashboard that turns your completed tasks and focus sessions into a living galaxy. The UI is the original “OG Galaxy” dashboard (tasks, calendar, music, galaxy canvas) but now backed by Flask + MongoDB Atlas with clean routes, seed scripts, and local music.
+**Where every small step leaves a star behind.
+A galaxy shaped by your discipline.**
+**OJT Project — Sakshi & Aryan**
 
-## Project Structure
+
+
+## ⭐ About CodeGalaxy
+
+**CodeGalaxy is our full-stack focus & productivity system**, built to transform everyday study/work sessions into a cosmic visual experience.
+
+We designed it because normal to-do list apps felt dull, repetitive, and not motivating enough.
+So we built something better — a dashboard where:
+
+* Every completed **focus session** adds a **golden star**
+* Tasks sit inside a clean calendar
+* Progress feels visual, alive, rewarding
+* Your galaxy grows with you
+
+This is *our* app.
+This is how *we* used our creativity, engineering skills, and a LOT of debugging to bring CodeGalaxy to life.
+
+
+
+# 🚀 What CodeGalaxy Does
+
+When you open the app, you get one powerful dashboard:
+
+### ✔ Focus Timer
+
+You pick a mood → start a focus session → when it ends, a **golden star** appears in your personal galaxy.
+
+### ✔ Galaxy Canvas
+
+Stars represent your discipline.
+Drag them, arrange them, save layouts, apply constellation presets — all without losing existing stars.
+
+### ✔ Tasks + Calendar
+
+Add tasks with **date + time**, view them on the calendar, and use the side panel to see everything for a specific day.
+
+### ✔ Upcoming Panel
+
+Automatically shows tasks due soon → helps you plan smarter.
+
+### ✔ Music Player
+
+Local audio tracks play during focus (small, stable files).
+There’s also a Spotify button if you want playlists without using APIs.
+
+### ✔ Reset & Stats
+
+Reset the galaxy, reset stats, check streaks, weekly focus minutes, total sessions.
+
+Everything works under our demo user setup so evaluators can try it instantly — no login needed.
+
+
+
+# 🗂️ Project Structure (simple explanation)
 
 ```
-.
-├── backend/
-│   ├── app.py               # Flask app factory + route wiring
-│   ├── routes/              # Tasks, calendar, sessions, stats, galaxy, music, etc.
-│   ├── utils/               # Mongo connection + celestial body generator
-│   ├── seeds/               # Data seeding scripts
-│   └── ...                  # (no frontend assets here)
-├── frontend/
-│   ├── templates/           # index.html (OG Galaxy UI)
-│   └── static/              # CSS, JS, media
-├── backend/seeds/           # Seed scripts for moods, tasks, demo stars
-├── requirements.txt
-├── Procfile
-└── .env.example
+backend/
+    app.py               → Flask app
+    routes/              → APIs (tasks, calendar, sessions, galaxy)
+    utils/               → MongoDB connector, helpers
+    seeds/               → Optional demo data
+
+frontend/
+    templates/           → index.html (main UI)
+    static/              → CSS, JS, media, galaxy scripts
+
+requirements.txt
+Procfile
+.env.example
 ```
 
-## Prerequisites
+We decided to let Flask serve both frontend + backend, so the app runs as one clean service.
 
-- Python 3.11+ (recommended)
-- MongoDB Atlas cluster + connection string (SRV URI)
 
-## 1. Install Dependencies
 
-```bash
+# 🔧 How to Run CodeGalaxy Locally
+
+### 1. Install dependencies
+
+```
 python -m venv .venv
-source .venv/bin/activate          # Windows: .venv\Scripts\activate
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## 2. Environment Variables
+### 2. Configure MongoDB
 
-Copy `.env.example` to `.env` and fill in your Atlas URI:
-
-```bash
-cp .env.example .env
-```
+Copy `.env.example` → `.env` and add your Atlas URI:
 
 ```
+MONGODB_URI="mongodb+srv://USERNAME:PASSWORD@cluster.mongodb.net/?retryWrites=true&w=majority"
+SECRET_KEY="anyrandomstring"
 ```
-MONGODB_URI="mongodb+srv://<user>:<password>@cluster0.example.mongodb.net/?retryWrites=true&w=majority"
+
+### 3. Start the app
+
 ```
-
-> **Note**: Set `MONGODB_URI` before running the app. If not set, it defaults to `mongodb://localhost:27017/codegalaxy` for local development.
-
-No Spotify keys are required now—the music player serves local WAV files located under `backend/static/media`.
-
-### Audio Files
-- **Location**: `backend/static/media` (default pack) and `backend/static/audio/lofi` (Lofi pack).
-- **Format**: MP3 or WAV.
-- **Size**: Recommended 1-3MB per file, ~128kbps.
-- **Fallback**: You can provide multiple files per mood in `audioController.js` (e.g., `['file1.mp3', 'file2.mp3']`). The player will try them in order.
-
-## 3. Run the Backend (serves frontend too)
-
-```bash
 python -m backend.app
-# Visit http://localhost:3000/
 ```
 
-The Flask app serves `backend/templates/index.html` along with all CSS/JS, so open the site via the local server rather than double-clicking the HTML file.
+Visit:
+👉 **[http://localhost:3000](http://localhost:3000)**
 
-## 4. Seed Demo Data (optional but recommended)
 
-Use the provided scripts to populate moods, demo tasks, and celestial objects:
 
-```bash
-python -m backend.seeds.seed_moods
-python -m backend.seeds.seed_tasks
-python -m backend.seeds.seed_demo_stars
+# 🎧 Music Setup
+
+All music is local — no API required.
+Add or remove MP3/WAV files in:
+
+```
+backend/static/media
 ```
 
-These scripts write to the same database configured via `MONGODB_URI`.
+The app picks them automatically.
 
-## 5. Available APIs
+Spotify button opens your curated playlists in a new tab.
 
-| Endpoint | Method(s) | Description |
-|----------|-----------|-------------|
-| `/api/tasks` | GET, POST | List or create tasks |
-| `/api/tasks/<id>` | PUT, DELETE | Update/delete task |
-| `/api/tasks/<id>/complete` | PATCH | Mark completed |
-| `/sessions` | POST | Save a focus session + create celestial body |
-| `/sessions/today` | GET | Today’s sessions |
-| `/api/calendar` | GET, POST | Calendar events |
-| `/api/calendar/<id>` | DELETE | Delete event |
-| `/api/galaxy/data` | GET | Celestial objects for canvas |
-| `/stats/summary` | GET | Totals for dashboard |
-| `/stats/streak` | GET | Current streak |
-| `/stats/weekly` | GET | Weekly minutes |
-| `/moods` | GET | Mood list (for timer chips) |
-| `/moods/<mood>/playlist` | GET | Placeholder metadata |
-| `/api/music` | GET | Local WAV playlist metadata |
-| `/api/galaxy/reset` | POST | Delete all celestial objects for the demo user |
-| `/api/galaxy/layout` | GET, POST | Fetch or persist custom galaxy layouts |
-| `/api/constellations` | GET | Preset constellation positions |
-| `/status` | GET | DB health check |
+---
 
-All routes assume a single demo user (`demo-user`) so the experience works without auth.
+# 🌠 Galaxy Features (Our Favourite Part)
 
-## 6. Local Music Player
+### ⭐ Focus session → Golden star
 
-`backend/static/media` contains three small WAV loops generated offline:
+Stars symbolize discipline.
 
-- Nebula Drift
-- Starlight Echoes
-- Comet Trail
+### ⭐ Constellation system (with safe merge)
 
-The `/api/music` route returns these files, and `static/js/music.js` plays them through the existing audio player. You can add more WAV/MP3 files to the same folder and adjust `backend/routes/music.py` accordingly.
+Apply a constellation → **no stars disappear.**
+We fixed the old overwrite bug.
 
-## 7. Deployment
+### ⭐ Drag & Drop
 
-- Use the same `.env` variables on your hosting provider (Render, Railway, etc.).
-- `Procfile` already defines `web: gunicorn backend.app:app`.
+Move stars anywhere, save layout, revert layout.
 
-## Troubleshooting
+### ⭐ Reset
 
-- **No CSS when double-clicking `index.html`**: The frontend is in `/frontend`, but you must serve it through Flask (`python -m backend.app`) because the HTML references `/static/...` via `url_for`.
-- **Mongo errors**: Verify `MONGODB_URI` is correct and that your IP is allowed in Atlas network access.
-- **Galaxy is empty**: Run the seed scripts above or complete a focus session via the timer panel to generate stars.
+Starts your galaxy fresh.
 
-## Developer Notes (Galaxy Debugging)
 
-- **Reset button** inside the galaxy panel calls `/api/galaxy/reset`. Use it to clear out celestial objects instantly when iterating on layouts.
-- **Constellation presets / drag & drop**: apply a preset, drag stars directly on the canvas (unlock the pattern), then click “Save Layout” which POSTs to `/api/galaxy/layout`. “Revert” re-fetches the last saved layout from the same endpoint.
-- **API smoke test**: open the browser console and run `window.GalaxyBG.addStarAt(50, 20)` or `window.resetGalaxy()` to verify the new helpers are wired before integrating backend automation.
 
-Happy galaxy building! 🚀
+# 📅 Calendar & Tasks
 
+* Add tasks with **date + time**
+* Multiple tasks per day
+* Clicking a date opens a side panel with all tasks
+* Checkbox to mark tasks done
+* Upcoming section auto-updates
+
+---
+
+# 🌍 Deploying CodeGalaxy
+
+We recommend **Render** for hosting:
+
+### Build
+
+```
+pip install -r requirements.txt
+```
+
+### Start
+
+```
+gunicorn backend.app:app
+```
+
+### Environment Vars
+
+```
+MONGODB_URI=<your uri>
+SECRET_KEY=<your key>
+```
+
+Whenever main branch updates → Render redeploys.
+
+
+
+# 🧪 Troubleshooting (Fast Guide)
+
+### MongoDB not connecting?
+
+Check:
+
+* correct username + password
+* IP whitelist = 0.0.0.0/0
+* run:
+
+```
+client.admin.command("ping")
+```
+
+### Galaxy empty?
+
+Run seed scripts or complete a focus session.
+
+### Music not playing?
+
+Use small MP3/WAV files.
+
+### CSS missing?
+
+Open app via Flask, not static HTML.
+
+
+
+# 🧑‍💻 Built By
+
+### ⭐ **Sakshi Kasat**
+
+Backend Integration • Database • Focus Logic • Galaxy System • Deployment • Debugging • Full App Integration
+
+### ⭐ **Aryan**
+
+Frontend UI • Canvas Rendering • Constellation System • Animations • Layout • Interactions
+
+Together, we shaped CodeGalaxy into a clean, aesthetic, fully working full-stack product for our OJT project.
+
+
+
+# ✨ Footer
+
+**CodeGalaxy — where procrastination ends and the Big Bang begins
+OJT Project — Sakshi & Aryan**
 
