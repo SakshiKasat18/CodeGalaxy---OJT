@@ -71,6 +71,25 @@ def create_app() -> Flask:
     def favicon():
         return "", 204  # No content response for favicon
 
+    # Error handlers for better debugging
+    @app.errorhandler(500)
+    def internal_error(error):
+        import traceback
+        return jsonify({
+            "error": "Internal Server Error",
+            "message": str(error),
+            "traceback": traceback.format_exc()
+        }), 500
+
+    @app.errorhandler(Exception)
+    def handle_exception(e):
+        import traceback
+        return jsonify({
+            "error": "Unhandled Exception",
+            "message": str(e),
+            "traceback": traceback.format_exc()
+        }), 500
+
     # Backwards compatible API routes used by existing frontend
     @app.route("/api/tasks", methods=["GET"])
     def api_get_tasks():
