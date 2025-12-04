@@ -66,6 +66,10 @@ def create_app() -> Flask:
     @app.route("/")
     def index():
         return render_template("index.html")
+    
+    @app.route("/favicon.ico")
+    def favicon():
+        return "", 204  # No content response for favicon
 
     # Backwards compatible API routes used by existing frontend
     @app.route("/api/tasks", methods=["GET"])
