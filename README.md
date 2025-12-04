@@ -1,140 +1,295 @@
-<<<<<<< HEAD
-# CodeGalaxy---OJT
-A productivity web app that turns your daily focus sessions into a growing galaxy. Built with a custom timer, mood-based playlists, and a dynamic Canvas-powered universe that expands with every task you complete.
-=======
-# CodeGalaxy
+# 🌌 CodeGalaxy - Productivity Tracker
 
-CodeGalaxy is a focus & productivity dashboard that turns your completed tasks and focus sessions into a living galaxy. The UI is the original “OG Galaxy” dashboard (tasks, calendar, music, galaxy canvas) but now backed by Flask + MongoDB Atlas with clean routes, seed scripts, and local music.
+Transform your daily tasks and focus sessions into a beautiful, growing galaxy. Every completed task and focus session creates a star in your personal universe!
 
-## Project Structure
+![CodeGalaxy](https://img.shields.io/badge/Flask-3.0.0-blue)
+![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green)
+![Python](https://img.shields.io/badge/Python-3.11+-yellow)
 
+## ✨ Features
+
+- **📝 Task Management**: Create, organize, and complete tasks across multiple categories (Personal, Work, Life, Study)
+- **⏱️ Focus Timer**: Pomodoro-style timer with preset durations (15m, 25m, 45m) or custom times
+- **🎵 Mood-Based Music**: Local audio player with mood selections (Focus, Calm, Chill, Energy, Deep Work, Night)
+- **📅 Calendar Integration**: Visual calendar with event scheduling
+- **🌟 Galaxy Visualization**: Watch your galaxy grow with every achievement
+  - **Task completion creates bright white stars** ⭐
+  - **Focus sessions create colored celestial bodies** (stars, planets, comets)
+- **📊 Statistics Dashboard**: Track completion rates, focus time, and daily streaks
+- **🎨 Constellation Presets**: Arrange your stars in beautiful patterns (Cassiopeia, Grid, Lyra, Orion)
+- **💾 Layout Saving**: Drag & drop stars and save custom arrangements
+
+## 🚀 Quick Start (Local Development)
+
+### Prerequisites
+
+- Python 3.11 or higher
+- MongoDB Atlas account (free tier works great!)
+- Git
+
+### 1. Clone the Repository
+
+```bash
+git clone <your-repo-url>
+cd CodeGalaxy---OJT
 ```
-.
-├── backend/
-│   ├── app.py               # Flask app factory + route wiring
-│   ├── routes/              # Tasks, calendar, sessions, stats, galaxy, music, etc.
-│   ├── utils/               # Mongo connection + celestial body generator
-│   ├── seeds/               # Data seeding scripts
-│   └── ...                  # (no frontend assets here)
-├── frontend/
-│   ├── templates/           # index.html (OG Galaxy UI)
-│   └── static/              # CSS, JS, media
-├── backend/seeds/           # Seed scripts for moods, tasks, demo stars
-├── requirements.txt
-├── Procfile
-└── .env.example
-```
 
-## Prerequisites
-
-- Python 3.11+ (recommended)
-- MongoDB Atlas cluster + connection string (SRV URI)
-
-## 1. Install Dependencies
+### 2. Create Virtual Environment
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate          # Windows: .venv\Scripts\activate
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+```
+
+### 3. Install Dependencies
+
+```bash
 pip install -r requirements.txt
 ```
 
-## 2. Environment Variables
+### 4. Set Up MongoDB Atlas
 
-Copy `.env.example` to `.env` and fill in your Atlas URI:
+1. Go to [MongoDB Atlas](https://cloud.mongodb.com/)
+2. Create a free cluster
+3. Create a database user
+4. Whitelist your IP address (or use 0.0.0.0/0 for development)
+5. Get your connection string
+
+### 5. Configure Environment Variables
+
+Create a `.env` file in the project root:
 
 ```bash
 cp .env.example .env
 ```
 
+Edit `.env` and add your MongoDB connection string:
+
+```env
+MONGODB_URI=mongodb+srv://your_username:your_password@cluster0.xxxxx.mongodb.net/codegalaxy?retryWrites=true&w=majority
 ```
-```
-MONGODB_URI="mongodb+srv://<user>:<password>@cluster0.example.mongodb.net/?retryWrites=true&w=majority"
-```
 
-> **Note**: Set `MONGODB_URI` before running the app. If not set, it defaults to `mongodb://localhost:27017/codegalaxy` for local development.
-
-No Spotify keys are required now—the music player serves local WAV files located under `backend/static/media`.
-
-### Audio Files
-- **Location**: `backend/static/media` (default pack) and `backend/static/audio/lofi` (Lofi pack).
-- **Format**: MP3 or WAV.
-- **Size**: Recommended 1-3MB per file, ~128kbps.
-- **Fallback**: You can provide multiple files per mood in `audioController.js` (e.g., `['file1.mp3', 'file2.mp3']`). The player will try them in order.
-
-## 3. Run the Backend (serves frontend too)
+### 6. Run the Application
 
 ```bash
 python -m backend.app
-# Visit http://localhost:3000/
 ```
 
-The Flask app serves `backend/templates/index.html` along with all CSS/JS, so open the site via the local server rather than double-clicking the HTML file.
+Visit `http://localhost:3000` in your browser! 🎉
 
-## 4. Seed Demo Data (optional but recommended)
+## 🌐 Deploy to Vercel
 
-Use the provided scripts to populate moods, demo tasks, and celestial objects:
+### Step 1: Prepare Your Repository
 
+1. **Initialize Git** (if not already done):
 ```bash
-python -m backend.seeds.seed_moods
-python -m backend.seeds.seed_tasks
-python -m backend.seeds.seed_demo_stars
+git init
+git add .
+git commit -m "Initial commit: CodeGalaxy productivity app"
 ```
 
-These scripts write to the same database configured via `MONGODB_URI`.
+2. **Push to GitHub**:
+```bash
+# Create a new repository on GitHub first, then:
+git remote add origin https://github.com/yourusername/codegalaxy.git
+git branch -M main
+git push -u origin main
+```
 
-## 5. Available APIs
+### Step 2: Set Up MongoDB Atlas for Production
 
-| Endpoint | Method(s) | Description |
-|----------|-----------|-------------|
-| `/api/tasks` | GET, POST | List or create tasks |
-| `/api/tasks/<id>` | PUT, DELETE | Update/delete task |
-| `/api/tasks/<id>/complete` | PATCH | Mark completed |
-| `/sessions` | POST | Save a focus session + create celestial body |
-| `/sessions/today` | GET | Today’s sessions |
-| `/api/calendar` | GET, POST | Calendar events |
-| `/api/calendar/<id>` | DELETE | Delete event |
-| `/api/galaxy/data` | GET | Celestial objects for canvas |
-| `/stats/summary` | GET | Totals for dashboard |
-| `/stats/streak` | GET | Current streak |
-| `/stats/weekly` | GET | Weekly minutes |
-| `/moods` | GET | Mood list (for timer chips) |
-| `/moods/<mood>/playlist` | GET | Placeholder metadata |
-| `/api/music` | GET | Local WAV playlist metadata |
-| `/api/galaxy/reset` | POST | Delete all celestial objects for the demo user |
-| `/api/galaxy/layout` | GET, POST | Fetch or persist custom galaxy layouts |
-| `/api/constellations` | GET | Preset constellation positions |
-| `/status` | GET | DB health check |
+1. Go to your MongoDB Atlas dashboard
+2. Navigate to **Network Access**
+3. Click **Add IP Address**
+4. Select **Allow Access from Anywhere** (0.0.0.0/0) - Required for Vercel
+5. Save
 
-All routes assume a single demo user (`demo-user`) so the experience works without auth.
+### Step 3: Deploy to Vercel
 
-## 6. Local Music Player
+1. **Go to [Vercel](https://vercel.com/)** and sign in with GitHub
 
-`backend/static/media` contains three small WAV loops generated offline:
+2. **Import Your Repository**:
+   - Click "New Project"
+   - Select your CodeGalaxy repository
+   - Click "Import"
 
-- Nebula Drift
-- Starlight Echoes
-- Comet Trail
+3. **Configure Environment Variables**:
+   - In the Vercel project settings, go to **Environment Variables**
+   - Add the following:
+     ```
+     Key: MONGODB_URI
+     Value: mongodb+srv://your_username:your_password@cluster0.xxxxx.mongodb.net/codegalaxy?retryWrites=true&w=majority
+     ```
+   - Apply to: Production, Preview, and Development
 
-The `/api/music` route returns these files, and `static/js/music.js` plays them through the existing audio player. You can add more WAV/MP3 files to the same folder and adjust `backend/routes/music.py` accordingly.
+4. **Deploy**:
+   - Click "Deploy"
+   - Wait for the build to complete (2-3 minutes)
+   - Your app will be live at `https://your-project.vercel.app`
 
-## 7. Deployment
+### Step 4: Verify Deployment
 
-- Use the same `.env` variables on your hosting provider (Render, Railway, etc.).
-- `Procfile` already defines `web: gunicorn backend.app:app`.
+1. Visit your Vercel URL
+2. Create a task and complete it - a star should appear! ⭐
+3. Try the focus timer
+4. Check the galaxy visualization
 
-## Troubleshooting
+## 📁 Project Structure
 
-- **No CSS when double-clicking `index.html`**: The frontend is in `/frontend`, but you must serve it through Flask (`python -m backend.app`) because the HTML references `/static/...` via `url_for`.
-- **Mongo errors**: Verify `MONGODB_URI` is correct and that your IP is allowed in Atlas network access.
-- **Galaxy is empty**: Run the seed scripts above or complete a focus session via the timer panel to generate stars.
+```
+CodeGalaxy---OJT/
+├── api/
+│   └── index.py              # Vercel entry point
+├── backend/
+│   ├── app.py                # Flask application factory
+│   ├── routes/               # API endpoints
+│   │   ├── tasks.py          # Task CRUD + completion (creates stars!)
+│   │   ├── sessions.py       # Focus session management
+│   │   ├── galaxy.py         # Galaxy/celestial objects
+│   │   ├── stats.py          # Statistics & analytics
+│   │   ├── calendar.py       # Calendar events
+│   │   ├── music.py          # Music player
+│   │   ├── moods.py          # Mood management
+│   │   └── status.py         # Health check
+│   ├── utils/
+│   │   ├── db.py             # MongoDB connection
+│   │   └── star_logic.py     # Star generation algorithm
+│   ├── seeds/                # Data seeding scripts
+│   └── static/audio/         # Local audio files
+├── frontend/
+│   ├── templates/
+│   │   └── index.html        # Main UI
+│   └── static/
+│       ├── css/              # Stylesheets
+│       ├── js/               # JavaScript modules
+│       └── media/            # Audio files
+├── .env.example              # Environment template
+├── .gitignore                # Git ignore rules
+├── requirements.txt          # Python dependencies
+├── vercel.json               # Vercel configuration
+└── README.md                 # This file
+```
 
-## Developer Notes (Galaxy Debugging)
+## 🔧 API Endpoints
 
-- **Reset button** inside the galaxy panel calls `/api/galaxy/reset`. Use it to clear out celestial objects instantly when iterating on layouts.
-- **Constellation presets / drag & drop**: apply a preset, drag stars directly on the canvas (unlock the pattern), then click “Save Layout” which POSTs to `/api/galaxy/layout`. “Revert” re-fetches the last saved layout from the same endpoint.
-- **API smoke test**: open the browser console and run `window.GalaxyBG.addStarAt(50, 20)` or `window.resetGalaxy()` to verify the new helpers are wired before integrating backend automation.
+### Tasks
+- `GET /api/tasks` - List all tasks
+- `POST /api/tasks` - Create new task
+- `PUT /api/tasks/<id>` - Update task
+- `DELETE /api/tasks/<id>` - Delete task
+- `PATCH /api/tasks/<id>/complete` - **Complete task & create star** ⭐
 
-Happy galaxy building! 🚀
+### Sessions
+- `POST /sessions` - Create focus session + celestial object
+- `GET /sessions/today` - Get today's sessions
 
+### Galaxy
+- `GET /api/galaxy/data` - Get all celestial objects
+- `POST /api/galaxy/stars` - Bulk create stars
+- `DELETE /api/galaxy/stars` - Bulk delete stars
+- `POST /api/galaxy/reset` - Reset entire galaxy
+- `GET /api/galaxy/layout` - Get star positions
+- `POST /api/galaxy/layout` - Save star positions
+- `GET /api/constellations` - Get preset constellations
 
->>>>>>> sakshi_branch1
+### Statistics
+- `GET /stats/summary` - Dashboard overview
+- `GET /stats/streak` - Current streak
+- `GET /stats/weekly` - Weekly focus minutes
+
+### Calendar
+- `GET /api/calendar` - List events
+- `POST /api/calendar` - Create event
+- `DELETE /api/calendar/<id>` - Delete event
+
+## 🎨 How Stars Are Created
+
+### Task Completion Stars ⭐
+When you complete a task:
+- **Color**: Bright white (`#F7F7FF`)
+- **Size**: Small star (15-minute equivalent)
+- **Type**: `star`
+- **Metadata**: Includes task title, category, and ID
+
+### Focus Session Stars 🌟
+When you complete a focus session:
+- **Color**: Based on mood (Focus, Calm, Energy, etc.)
+- **Size**: Varies by duration
+  - < 10 min → tiny_star
+  - 10-30 min → star
+  - 30-60 min → planet
+  - > 60 min → comet
+- **Type**: Dynamic based on duration
+- **Metadata**: Includes session duration and mood
+
+## 🛠️ Technologies Used
+
+- **Backend**: Flask 3.0.0, Python 3.11+
+- **Database**: MongoDB Atlas
+- **Frontend**: Vanilla JavaScript, HTML5 Canvas
+- **Deployment**: Vercel
+- **Audio**: Local WAV/MP3 files
+
+## 🐛 Troubleshooting
+
+### MongoDB Connection Issues
+
+**Problem**: "Failed to connect to MongoDB"
+
+**Solutions**:
+1. Check your `MONGODB_URI` in `.env` or Vercel environment variables
+2. Verify your MongoDB Atlas IP whitelist includes `0.0.0.0/0`
+3. Ensure your database user has read/write permissions
+4. Check that your connection string includes the database name
+
+### Stars Not Appearing
+
+**Problem**: Tasks complete but no stars appear
+
+**Solutions**:
+1. Check browser console for errors (F12)
+2. Verify MongoDB connection is working (`/status` endpoint)
+3. Clear browser cache and refresh
+4. Check that `/api/galaxy/data` returns celestial objects
+
+### Vercel Deployment Fails
+
+**Problem**: Build fails on Vercel
+
+**Solutions**:
+1. Ensure `requirements.txt` has all dependencies
+2. Check that `api/index.py` exists
+3. Verify `vercel.json` is properly configured
+4. Check Vercel build logs for specific errors
+
+## 📝 Environment Variables
+
+| Variable | Description | Required | Default |
+|----------|-------------|----------|---------|
+| `MONGODB_URI` | MongoDB Atlas connection string | Yes | `mongodb://localhost:27017/codegalaxy` (dev) |
+| `FLASK_ENV` | Flask environment | No | `production` |
+| `FLASK_DEBUG` | Enable debug mode | No | `False` |
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is open source and available under the MIT License.
+
+## 🙏 Acknowledgments
+
+- Inspired by the beauty of the cosmos
+- Built with love for productivity enthusiasts
+- Special thanks to the Flask and MongoDB communities
+
+---
+
+**Made with ❤️ and ☕ by CodeGalaxy Team**
+
+🌟 **Star this repo if you found it helpful!** 🌟

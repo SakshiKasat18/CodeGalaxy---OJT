@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import os
 from dotenv import load_dotenv
 from flask import Flask, render_template
+from flask_cors import CORS
 
 from .utils.db import ensure_indexes
 from .routes.tasks import bp as tasks_bp
@@ -12,8 +14,6 @@ from .routes.stats import bp as stats_bp
 from .routes.status import bp as status_bp
 from .routes.calendar import bp as calendar_bp
 from .routes.music import bp as music_bp
-
-import os
 
 load_dotenv()
 
@@ -33,12 +33,26 @@ def create_app() -> Flask:
         static_folder=static_path,
     )
 
+    # Enable CORS for production deployment
+    CORS(app, resources={
+        r"/*": {
+            "origins": "*",
+            "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization"]
+        }
+    })
+
     @app.route('/static/<path:filename>')
     def custom_static(filename):
         return app.send_static_file(filename)
 
     # Initialize DB indexes
-    ensure_indexes()
+    try:
+        ensure_indexes()
+    except Exception as e:
+        print(f"⚠️  Warning: Could not initialize MongoDB indexes: {e}")
+        print("  The app will continue but database features may not work.")
+        print(f"  Make sure MONGODB_URI is set correctly in your environment variables.")
 
     # Blueprints
     app.register_blueprint(tasks_bp)
@@ -53,6 +67,29 @@ def create_app() -> Flask:
     @app.route("/")
     def index():
         return render_template("index.html")
+    
+    @app.route("/favicon.ico")
+    def favicon():
+        return "", 204  # No content response for favicon
+
+    # Error handlers for better debugging
+    @app.errorhandler(500)
+    def internal_error(error):
+        import traceback
+        return jsonify({
+            "error": "Internal Server Error",
+            "message": str(error),
+            "traceback": traceback.format_exc()
+        }), 500
+
+    @app.errorhandler(Exception)
+    def handle_exception(e):
+        import traceback
+        return jsonify({
+            "error": "Unhandled Exception",
+            "message": str(e),
+            "traceback": traceback.format_exc()
+        }), 500
 
     # Backwards compatible API routes used by existing frontend
     @app.route("/api/tasks", methods=["GET"])
@@ -78,6 +115,12 @@ def create_app() -> Flask:
         from .routes.tasks import delete_task
 
         return delete_task(task_id)
+
+    @app.route("/api/tasks/<task_id>/complete", methods=["PATCH"])
+    def api_complete_task(task_id: str):
+        from .routes.tasks import complete_task
+
+        return complete_task(task_id)
 
     @app.route("/api/galaxy", methods=["GET"])
     def api_galaxy():
