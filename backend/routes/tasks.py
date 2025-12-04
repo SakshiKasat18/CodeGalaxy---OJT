@@ -134,8 +134,10 @@ def delete_task(task_id: str):
 def complete_task(task_id: str):
     """
     PATCH /tasks/<id>/complete
-    Marks task as completed=true.
+    Marks task as completed=true and creates a star in the galaxy.
     """
+    from ..utils.star_logic import create_celestial_for_session
+    
     db = get_db()
     user_id = get_default_user_id()
 
@@ -144,7 +146,37 @@ def complete_task(task_id: str):
     except Exception:
         return jsonify({"error": "Invalid task id"}), 400
 
+    # Get the task details before updating
+    task = db.tasks.find_one({"_id": oid, "user_id": user_id})
+    if not task:
+        return jsonify({"error": "Task not found"}), 404
+
+    # Update task as completed
     db.tasks.update_one({"_id": oid, "user_id": user_id}, {"$set": {"completed": True}})
-    return jsonify({"message": "Task marked as completed"})
+    
+    # Create a celestial object for the completed task
+    # Use a fixed duration for task completion (e.g., 15 minutes equivalent)
+    # This creates a small star for each completed task
+    celestial = create_celestial_for_session(
+        db=db,
+        session_id=f"task-{task_id}",
+        duration_minutes=15.0,  # Fixed duration for task completion
+        mood="happy",  # Use a bright color for task completion
+        meta={
+            "source": "task_completion",
+            "task_id": task_id,
+            "task_title": task.get("title", ""),
+            "task_category": task.get("category", "Personal")
+        }
+    )
+    
+    return jsonify({
+        "message": "Task marked as completed",
+        "celestial": {
+            "id": str(celestial.meta.get("_id")) if "_id" in celestial.meta else None,
+            "type": celestial.type,
+            "color": celestial.color
+        }
+    })
 
 

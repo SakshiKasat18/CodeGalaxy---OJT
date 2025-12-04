@@ -1,4 +1,4 @@
-#!/Users/sakshidattaprasadkasat/CodeGalaxy/.venv/bin/python3.12
+#!/Users/aryanchoudhary/Desktop/OJT/CodeGalaxy---OJT/.venv/bin/python3.13
 import sys
 from pip._internal.cli.main import main
 if __name__ == '__main__':

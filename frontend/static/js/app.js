@@ -178,27 +178,48 @@ async function toggleTask(taskId, currentCompleted) {
         const taskData = await fetch(`/api/tasks?category=all`).then(r => r.json());
         const task = taskData.find(t => t.id === taskId);
 
-        const response = await fetch(`/api/tasks/${taskId}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                ...task,
-                completed: !currentCompleted
-            })
-        });
+        let response;
+        
+        // If marking as complete, use the PATCH endpoint that creates a star
+        if (!currentCompleted) {
+            response = await fetch(`/api/tasks/${taskId}/complete`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' }
+            });
+        } else {
+            // If uncompleting, use PUT to update
+            response = await fetch(`/api/tasks/${taskId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ...task,
+                    completed: false
+                })
+            });
+        }
 
         if (response.ok) {
             await Promise.all([loadTasks(), loadCalendar(), loadUpcoming()]);
 
-            // If task was just completed, show appreciation
+            // If task was just completed, show appreciation and reload galaxy
             if (!currentCompleted) {
                 const messages = [
-                    "Task completed — well done!",
-                    "Nice! Task finished.",
-                    "Good job — keep the streak alive!"
+                    "Task completed — well done! ⭐",
+                    "Nice! Task finished. A star is born! ⭐",
+                    "Good job — keep the streak alive! ⭐"
                 ];
                 const msg = messages[Math.floor(Math.random() * messages.length)];
                 Toast.show(msg, 'success');
+                
+                // Reload galaxy to show the new star
+                if (window.loadGalaxy) {
+                    await window.loadGalaxy();
+                }
+                
+                // Reload stats to update counts
+                if (window.loadStats) {
+                    await window.loadStats();
+                }
             }
         }
     } catch (error) {

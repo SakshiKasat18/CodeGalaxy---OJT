@@ -4,6 +4,7 @@ from typing import Any, Dict
 from dotenv import load_dotenv
 from pymongo import MongoClient
 from pymongo.database import Database
+from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
 
 
 load_dotenv()
@@ -13,19 +14,36 @@ _client: MongoClient | None = None
 
 def get_client() -> MongoClient:
     """
-    Return a singleton MongoClient instance.
+    Return a singleton MongoClient instance with production-ready settings.
 
     The URI is loaded from the MONGODB_URI environment variable.
-    Falls back to local MongoDB if not set.
+    Falls back to local MongoDB if not set (development only).
     """
     global _client
     if _client is None:
         mongo_uri = os.getenv("MONGODB_URI")
         if not mongo_uri:
-            # Fallback to local
+            # Fallback to local (development only)
             mongo_uri = "mongodb://localhost:27017/codegalaxy"
-            print(f"MONGODB_URI not set. Using local fallback: {mongo_uri}")
-        _client = MongoClient(mongo_uri, tlsAllowInvalidCertificates=True)
+            print("⚠️  MONGODB_URI not set. Using local fallback (development mode)")
+        
+        try:
+            # Production-ready MongoDB client configuration
+            _client = MongoClient(
+                mongo_uri,
+                serverSelectionTimeoutMS=5000,  # 5 second timeout
+                connectTimeoutMS=10000,  # 10 second connection timeout
+                socketTimeoutMS=20000,  # 20 second socket timeout
+                maxPoolSize=50,  # Connection pool size
+                retryWrites=True,  # Retry failed writes
+                w='majority'  # Write concern for data safety
+            )
+            # Test the connection
+            _client.admin.command('ping')
+            print("✓ MongoDB connection successful")
+        except (ConnectionFailure, ServerSelectionTimeoutError) as e:
+            print(f"❌ MongoDB connection failed: {e}")
+            raise Exception(f"Failed to connect to MongoDB: {e}")
     return _client
 
 
