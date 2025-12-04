@@ -14,6 +14,8 @@ try:
     print("✓ Flask app imported successfully")
 except Exception as e:
     print(f"❌ Error importing Flask app: {e}")
+    import traceback
+    traceback.print_exc()
     raise
 
 # Vercel serverless function handler
