@@ -32,24 +32,30 @@ def list_tasks():
     GET /tasks
     Optional query params: category, completed
     """
-    db = get_db()
-    user_id = get_default_user_id()
+    try:
+        db = get_db()
+        user_id = get_default_user_id()
 
-    query: Dict[str, Any] = {"user_id": user_id}
+        query: Dict[str, Any] = {"user_id": user_id}
 
-    category = request.args.get("category")
-    if category and category != "all":
-        query["category"] = category
+        category = request.args.get("category")
+        if category and category != "all":
+            query["category"] = category
 
-    completed = request.args.get("completed")
-    if completed is not None:
-        query["completed"] = completed == "true"
+        completed = request.args.get("completed")
+        if completed is not None:
+            query["completed"] = completed == "true"
 
-    docs = (
-        db.tasks.find(query)
-        .sort([("date", -1), ("due_at", 1), ("created_at", -1)])
-    )
-    return jsonify([serialize_task(d) for d in docs])
+        docs = (
+            db.tasks.find(query)
+            .sort([("date", -1), ("due_at", 1), ("created_at", -1)])
+        )
+        return jsonify([serialize_task(d) for d in docs])
+    except Exception as e:
+        print(f"Error in list_tasks: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e), "message": "Failed to list tasks"}), 500
 
 
 @bp.post("")
@@ -58,26 +64,32 @@ def create_task():
     POST /tasks
     Body: { title, description?, date, due_at?, priority?, category?, completed? }
     """
-    db = get_db()
-    user_id = get_default_user_id()
-    data = request.get_json(silent=True) or {}
+    try:
+        db = get_db()
+        user_id = get_default_user_id()
+        data = request.get_json(silent=True) or {}
 
-    doc = {
-        "user_id": user_id,
-        "title": data.get("title", "").strip(),
-        "description": data.get("description", "").strip(),
-        "date": data.get("date"),
-        "due_at": data.get("due_at"),
-        "priority": data.get("priority", "Medium"),
-        "category": data.get("category", "Personal"),
-        "completed": bool(data.get("completed", False)),
-        "created_at": datetime.utcnow(),
-    }
-    result = db.tasks.insert_one(doc)
-    return (
-        jsonify({"id": str(result.inserted_id), "message": "Task created successfully"}),
-        201,
-    )
+        doc = {
+            "user_id": user_id,
+            "title": data.get("title", "").strip(),
+            "description": data.get("description", "").strip(),
+            "date": data.get("date"),
+            "due_at": data.get("due_at"),
+            "priority": data.get("priority", "Medium"),
+            "category": data.get("category", "Personal"),
+            "completed": bool(data.get("completed", False)),
+            "created_at": datetime.utcnow(),
+        }
+        result = db.tasks.insert_one(doc)
+        return (
+            jsonify({"id": str(result.inserted_id), "message": "Task created successfully"}),
+            201,
+        )
+    except Exception as e:
+        print(f"Error in create_task: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e), "message": "Failed to create task"}), 500
 
 
 @bp.put("/<task_id>")

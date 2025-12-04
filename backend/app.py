@@ -51,7 +51,8 @@ def create_app() -> Flask:
         ensure_indexes()
     except Exception as e:
         print(f"⚠️  Warning: Could not initialize MongoDB indexes: {e}")
-        print("  The app will continue but some features may not work optimally.")
+        print("  The app will continue but database features may not work.")
+        print(f"  Make sure MONGODB_URI is set correctly in your environment variables.")
 
     # Blueprints
     app.register_blueprint(tasks_bp)

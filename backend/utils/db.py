@@ -29,21 +29,27 @@ def get_client() -> MongoClient:
         
         try:
             # Production-ready MongoDB client configuration
+            # For serverless (Vercel), we need simpler settings
             _client = MongoClient(
                 mongo_uri,
-                serverSelectionTimeoutMS=5000,  # 5 second timeout
-                connectTimeoutMS=10000,  # 10 second connection timeout
-                socketTimeoutMS=20000,  # 20 second socket timeout
-                maxPoolSize=50,  # Connection pool size
-                retryWrites=True,  # Retry failed writes
-                w='majority'  # Write concern for data safety
+                serverSelectionTimeoutMS=10000,  # 10 second timeout for serverless
+                connectTimeoutMS=10000,
+                maxPoolSize=1,  # Serverless should use 1 connection
+                minPoolSize=0,
+                maxIdleTimeMS=45000,  # Close idle connections after 45s
+                retryWrites=True
             )
-            # Test the connection
+            # Test the connection with a quick ping
             _client.admin.command('ping')
             print("✓ MongoDB connection successful")
         except (ConnectionFailure, ServerSelectionTimeoutError) as e:
             print(f"❌ MongoDB connection failed: {e}")
-            raise Exception(f"Failed to connect to MongoDB: {e}")
+            # Don't raise in production - return None and handle gracefully
+            print(f"  Connection URI (masked): mongodb+srv://***:***@{mongo_uri.split('@')[1] if '@' in mongo_uri else 'unknown'}")
+            _client = None
+        except Exception as e:
+            print(f"❌ Unexpected MongoDB error: {e}")
+            _client = None
     return _client
 
 
@@ -55,6 +61,8 @@ def get_db() -> Database:
     lazily create the 'codegalaxy' database on first write.
     """
     client = get_client()
+    if client is None:
+        raise Exception("MongoDB client is not available. Check your MONGODB_URI environment variable.")
     return client["codegalaxy"]
 
 
